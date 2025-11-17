@@ -1,0 +1,36 @@
+services:
+  qwen3-omni:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: qwen3-omni:custom-build
+    container_name: qwen3-omni
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+    volumes:
+      # Maps your local cache to the container so you don't re-download the model every time
+      - ./hf_cache:/root/.cache/huggingface
+      - /models:/models
+
+    environment:
+      # "host" allows the container to use the host's shared memory (Crucial for VLLM)
+      - NCCL_DEBUG=WARN
+      - HF_TOKEN=${HF_TOKEN} # Optional: If you need to pass a token
+    ipc: host
+    ports:
+      - "18100:8000"
+    command: >
+      --model /models/cpatonn/Qwen3-Omni-30B-A3B-Instruct-AWQ-4bit
+      --served-model-name qwen3-omni
+      --max-model-len 32768
+      --gpu-memory-utilization 0.95
+      --trust-remote-code
+      --dtype float16
+      --tensor-parallel-size 4
+      --pipeline-parallel-size 1
+      --max-num-seqs 1
