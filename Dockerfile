@@ -36,9 +36,9 @@ RUN pip install --upgrade pip && \
     pip install -r requirements/build.txt
 
 # Install vLLM from source
-# MAX_JOBS=60 is very high. Unless you have a Threadripper/EPYC CPU,
+# MAX_JOBS=96 is very high. Unless you have a Threadripper/EPYC CPU,
 # lower this to (Total Cores - 2) to prevent OOM crashes.
-ENV MAX_JOBS=60
+ENV MAX_JOBS=96
 RUN pip install . --no-build-isolation
 
 # Install Qwen3-Omni specific dependencies
